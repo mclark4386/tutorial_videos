@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+POWER = 2
 def main():
     x = 10.0
     y = float(10)
@@ -14,7 +15,7 @@ def main():
     print("Welcome, %s!" % y)
 
     x = int(input("Please enter a number:"))
-    print("You entered the number \"%d\". (%d^2) == %d" % (x,x,x**2))
+    print("You entered the number \"%d\". (%d^%i) == %d" % (x,x,POWER,x**POWER))
 
     x = 42
     print(dict["name"] + ' is 42 years of ' + dict[x])
