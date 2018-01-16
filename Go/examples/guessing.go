@@ -19,6 +19,9 @@ func main() {
 	for {		
 		i, err := read_user_input()
 		if err != nil {
+			if strings.Contains(fmt.Sprintf("%v",err),"strconv.Atoi") {
+				continue
+			}
 			return
 		}
 
@@ -51,7 +54,7 @@ func read_user_input() (int, error){
 
 	i, err2 := strconv.Atoi(strings.TrimSpace(str))
 	if err2 != nil{
-		fmt.Printf("ERROR!!!!: %v\n",err2)
+		fmt.Println("Please only enter a number 1-100!")
 		return i, err2
 	}
 	return i, nil
