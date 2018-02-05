@@ -8,20 +8,39 @@ import (
 	"os"
 	"strings"
 	"unicode/utf8"
+	"flag"
+	"io/ioutil"
+	"encoding/json"
 )
 
 var reader *bufio.Reader
 //                     0      1        2        3        4
 var words = []string{"cat", "dog", "gopher", "apple", "whale"}
 
+var path string
+
 func init(){
 	fmt.Println("Want to play a game?")
 	rand.Seed(time.Now().UnixNano())
 	reader = bufio.NewReader(os.Stdin)
+
+	flag.StringVar(&path, "f", "./words.json", "the path to the JSON file containing our word list")
+	flag.Parse()
+	println(path)
 }
 
 func main() {
-	the_word := words[rand.Intn(len(words))]
+	var the_word string
+	if flag.NFlag() == 0 {
+		the_word = words[rand.Intn(len(words))]
+	}else{
+		var err error
+		the_word,err = read_word_from_file()
+		if err != nil {
+			println("OH NOES!, FILE!")
+			return
+		}
+	}
 
 	fmt.Printf("Guess a word of length %d:", len(the_word))
 	
@@ -68,4 +87,31 @@ func read_user_input() (string, error){
 		return "", err
 	}
 	return str, nil
+}
+
+func read_word_from_file() (string, error){
+	file_body, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("Couldn't open/read file:", err)
+		return "", err
+	}
+
+	type WordList struct{
+		Words []string `json:"words"`
+	}
+
+	var raw WordList//map[string]interface{}
+		
+	err = json.Unmarshal(file_body, &raw)
+	if err != nil {
+		fmt.Println("Couldn't parse file:", err)
+		return "", err
+	}
+	
+	if len(raw.Words) > 0 {
+		return raw.Words[rand.Intn(len(raw.Words))], nil
+	}else{
+		fmt.Println("Invalid JSON data")
+		return "", fmt.Errorf("Invalid JSON data")
+	}
 }
